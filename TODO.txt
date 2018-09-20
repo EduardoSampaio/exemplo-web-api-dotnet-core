@@ -1,0 +1,2 @@
+- Padronizar response da api categoria
+- Autenticação
