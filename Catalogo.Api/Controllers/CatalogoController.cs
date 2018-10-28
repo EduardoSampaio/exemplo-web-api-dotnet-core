@@ -63,18 +63,18 @@ namespace Catalogo.Api.Controllers
                     UrlImagem = filme.UrlImagem,
                     CategoriaId = filme.CategoriaId,
                     Categoria = filme.Categoria.Nome
-                    
+
                 };
 
                 lista.Add(model);
             }
 
-            return Json(new HandlerMessage(HttpStatusCode.OK,"",lista));
+            return Json(new HandlerMessage(HttpStatusCode.OK, "", lista));
         }
 
         [HttpPost]
         [Route("Filmes")]
-        public IActionResult SalvarFilmes(FilmeCadastroModel model)
+        public IActionResult SalvarFilmes([FromBody]FilmeCadastroModel model)
         {
             try
             {
@@ -86,7 +86,7 @@ namespace Catalogo.Api.Controllers
                     Titulo = model.Titulo,
                     UrlImagem = model.UrlImagem,
                     CategoriaId = model.CategoriaId
-                    
+
                 };
 
                 _filmeRepositorio.Add(filme);
@@ -101,7 +101,7 @@ namespace Catalogo.Api.Controllers
 
         [HttpPut]
         [Route("Filmes")]
-        public IActionResult AtualizarFilmes(FilmeModel model)
+        public IActionResult AtualizarFilmes([FromBody]FilmeModel model)
         {
             var filme = _filmeRepositorio.Find(model.Id);
             filme.Nota = model.Nota;
@@ -155,7 +155,7 @@ namespace Catalogo.Api.Controllers
                 Nome = categoria.Nome
             };
 
-            return Json(model);
+            return Json(new HandlerMessage(HttpStatusCode.OK, "", model));
         }
 
         [HttpGet]
@@ -175,7 +175,7 @@ namespace Catalogo.Api.Controllers
 
                 lista.Add(model);
             }
-            return Json(lista);
+            return Json(new HandlerMessage(HttpStatusCode.OK, "", lista));
         }
 
         [HttpDelete]
@@ -186,17 +186,21 @@ namespace Catalogo.Api.Controllers
             {
                 _categoriaRepositorio.Remove(id);
                 _categoriaRepositorio.SaveChanges();
-                return Ok();
+                return Ok(new HandlerMessage(HttpStatusCode.OK, "Categoria Removida com sucesso!"));
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message); 
+                return BadRequest(
+                    new HandlerMessage(
+                    HttpStatusCode.BadRequest,
+                    $"Erro ao remover categoria {ex.Message}"
+                    ));
             }
         }
 
         [HttpPost]
         [Route("Categoria")]
-        public IActionResult SalvarCategoria(CategoriaCadastroModel model)
+        public IActionResult SalvarCategoria([FromBody]CategoriaCadastroModel model)
         {
             try
             {
@@ -207,30 +211,45 @@ namespace Catalogo.Api.Controllers
 
                 _categoriaRepositorio.Add(categoria);
                 _categoriaRepositorio.SaveChanges();
-                return Ok();
+                return Ok(new HandlerMessage(HttpStatusCode.OK, "Categoria Salva com sucesso!"));
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(
+                  new HandlerMessage(
+                  HttpStatusCode.BadRequest,
+                  $"Erro ao salvar categoria {ex.Message}"
+                  ));
             }
         }
 
         [HttpPut]
         [Route("Categoria")]
-        public IActionResult AtaualizarCategoria(CategoriaModel model)
+        public IActionResult AtaualizarCategoria([FromBody]CategoriaModel model)
         {
             var entidade = _categoriaRepositorio.Find(model.Id);
-            entidade.Nome = model.Nome;
+            if (entidade == null) {
+                return BadRequest(
+                 new HandlerMessage(
+                 HttpStatusCode.BadRequest,
+                 $"Erro ao atualizar categoria"
+                 ));
+            }
 
             try
             {
+                entidade.Nome = model.Nome;
                 _categoriaRepositorio.Update(entidade);
                 _categoriaRepositorio.SaveChanges();
-                return Ok();
+                return Ok(new HandlerMessage(HttpStatusCode.OK, "Categoria Atualiza com sucesso!"));
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(
+                  new HandlerMessage(
+                  HttpStatusCode.BadRequest,
+                  $"Erro ao atualizar categoria {ex.Message}"
+                  ));
             }
         }
 

@@ -1,2 +1,2 @@
-- Padronizar response da api categoria
+- Deploy Docker
 - Autenticação

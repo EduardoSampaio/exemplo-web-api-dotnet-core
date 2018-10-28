@@ -24,9 +24,17 @@ namespace Catalogo.Api
             services.AddMvc().AddJsonOptions(options=> {
                 options.SerializerSettings.NullValueHandling =
                        Newtonsoft.Json.NullValueHandling.Ignore;
+
+
             });
 
-            services.AddCors();
+            services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
+            {
+                builder.AllowAnyOrigin()
+                       .AllowAnyMethod()
+                       .AllowAnyHeader();
+            }));
+
 
             services.Configure<GzipCompressionProviderOptions>(
                 options => options.Level = CompressionLevel.Optimal);
@@ -72,6 +80,8 @@ namespace Catalogo.Api
             app.UseResponseCompression();
 
             app.UseSwagger();
+
+            app.UseCors("MyPolicy");
 
             app.UseSwaggerUI(c =>
             {
